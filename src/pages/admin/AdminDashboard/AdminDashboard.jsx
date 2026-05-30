@@ -125,7 +125,7 @@ function HeroStatCard({ label, value, icon, accentColor, iconBg, iconColor, delt
         height: '100%',
         background: accentColor
       }} />
-      
+
       <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
         <div style={{
           width: '48px',
@@ -141,8 +141,8 @@ function HeroStatCard({ label, value, icon, accentColor, iconBg, iconColor, delt
         }}>
           {icon}
         </div>
-        
-        <div style={{ flex: 1 }}>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
             fontSize: '26px',
             fontWeight: 700,
@@ -243,7 +243,7 @@ function PlanBreakdown({ data }) {
           }}>
             {p.name}
           </span>
-          
+
           <div style={{
             flex: 2,
             height: '8px',
@@ -259,7 +259,7 @@ function PlanBreakdown({ data }) {
               transition: 'width 0.3s ease'
             }} />
           </div>
-          
+
           <span style={{
             fontSize: '14px',
             fontWeight: 700,
@@ -457,7 +457,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [reminderLoading, setReminderLoading] = useState(false);
   const [reminderDone, setReminderDone] = useState(false);
-const navigate = useNavigate();
+  const navigate = useNavigate();
+
   useEffect(() => {
     dashboardAPI.getStats()
       .then(({ data }) => setStats(data))
@@ -515,6 +516,46 @@ const navigate = useNavigate();
       }
     >
       <style>{`
+        .hero-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 16px;
+          margin-bottom: 24px;
+        }
+
+        .mini-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          gap: 12px;
+          margin-bottom: 24px;
+        }
+
+        .charts-grid {
+          display: grid;
+          grid-template-columns: 1.6fr 1fr;
+          gap: 20px;
+          margin-bottom: 24px;
+        }
+
+        /* Stack the charts on tablet / mobile */
+        @media (max-width: 900px) {
+          .charts-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Horizontal scroll for the year chart so 12 months stay readable */
+        .chart-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .chart-scroll-inner { min-width: 460px; }
+
+        .section-head {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 20px 24px;
+          border-bottom: 1px solid var(--border);
+          background: var(--surface-2);
+        }
+
         .table {
           width: 100%;
           border-collapse: collapse;
@@ -546,15 +587,48 @@ const navigate = useNavigate();
         .table tbody tr:last-child td {
           border-bottom: none;
         }
+
+        /* Phone: turn the table rows into stacked cards */
+        @media (max-width: 640px) {
+          .section-head { padding: 16px; }
+
+          .table thead { display: none; }
+          .table, .table tbody { display: block; width: 100%; }
+
+          .table tr {
+            display: block;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+          }
+          .table tbody tr:last-child { border-bottom: none; }
+
+          .table td {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 7px 16px;
+            border: none;
+            font-size: 13px;
+          }
+          .table td::before {
+            content: attr(data-label);
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+          }
+          .table td.td-member { justify-content: flex-start; padding-top: 12px; }
+          .table td.td-member::before { display: none; }
+          .table td.td-empty { justify-content: center; }
+          .table td.td-empty::before { display: none; }
+        }
       `}</style>
 
       {/* Hero Stats */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-        gap: '16px',
-        marginBottom: '24px'
-      }}>
+      <div className="hero-grid">
         <HeroStatCard
           label="Total Members"
           value={m.total?.toLocaleString() || 0}
@@ -595,12 +669,7 @@ const navigate = useNavigate();
       </div>
 
       {/* Secondary Stats */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-        gap: '12px',
-        marginBottom: '24px'
-      }}>
+      <div className="mini-grid">
         <MiniStat label="Suspended" value={m.suspended || 0} variant="danger" />
         <MiniStat label="Renewals Due (7d)" value={s.renewalsDue || 0} variant="warning" />
         <MiniStat label="Overdue" value={p.overdue || 0} variant="danger" />
@@ -608,18 +677,15 @@ const navigate = useNavigate();
       </div>
 
       {/* Charts Row */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1.6fr 1fr',
-        gap: '20px',
-        marginBottom: '24px'
-      }}>
+      <div className="charts-grid">
         <Card>
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '20px'
+            gap: '12px',
+            marginBottom: '20px',
+            flexWrap: 'wrap'
           }}>
             <div>
               <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text)' }}>
@@ -639,7 +705,11 @@ const navigate = useNavigate();
               <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Revenue (Rs)</span>
             </div>
           </div>
-          <BarChart data={monthlyRevenueData} />
+          <div className="chart-scroll">
+            <div className="chart-scroll-inner">
+              <BarChart data={monthlyRevenueData} />
+            </div>
+          </div>
         </Card>
 
         <Card>
@@ -657,14 +727,7 @@ const navigate = useNavigate();
 
       {/* Recent Members Table */}
       <Card style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '20px 24px',
-          borderBottom: '1px solid var(--border)',
-          background: 'var(--surface-2)'
-        }}>
+        <div className="section-head">
           <div>
             <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text)' }}>
               Recent Members
@@ -673,7 +736,7 @@ const navigate = useNavigate();
               Latest 5 registrations
             </div>
           </div>
-          <Button variant="ghost" onClick={()=>{navigate('/admin/members')}} size="sm">View All →</Button>
+          <Button variant="ghost" onClick={() => { navigate('/admin/members'); }} size="sm">View All →</Button>
         </div>
 
         <table className="table">
@@ -689,7 +752,7 @@ const navigate = useNavigate();
           <tbody>
             {(s.recentMembers || []).length === 0 ? (
               <tr>
-                <td colSpan={5} style={{
+                <td className="td-empty" colSpan={5} style={{
                   textAlign: 'center',
                   color: 'var(--text-muted)',
                   padding: '40px'
@@ -700,7 +763,7 @@ const navigate = useNavigate();
             ) : (
               (s.recentMembers || []).map((member, i) => (
                 <tr key={member._id}>
-                  <td>
+                  <td className="td-member">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <Avatar name={member.name} index={i} />
                       <div>
@@ -711,17 +774,17 @@ const navigate = useNavigate();
                       </div>
                     </div>
                   </td>
-                  <td style={{ fontSize: '14px', fontWeight: 500 }}>
+                  <td data-label="Plan" style={{ fontSize: '14px', fontWeight: 500 }}>
                     {member.plan?.name || '—'}
                   </td>
-                  <td style={{
+                  <td data-label="Card No." style={{
                     fontFamily: 'var(--font-mono)',
                     fontSize: '13px',
                     color: 'var(--text-muted)'
                   }}>
                     {member.gymCardNumber}
                   </td>
-                  <td style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                  <td data-label="Joined" style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
                     {member.createdAt
                       ? new Date(member.createdAt).toLocaleDateString('en-PK', {
                           day: 'numeric',
@@ -730,7 +793,7 @@ const navigate = useNavigate();
                         })
                       : '—'}
                   </td>
-                  <td>
+                  <td data-label="Status">
                     <StatusBadge status={member.status} />
                   </td>
                 </tr>
