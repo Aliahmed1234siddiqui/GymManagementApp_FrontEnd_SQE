@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sora:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ── Brand ──────────────────────────────────── */
+  --blue:       #2563EB;
+  --blue-dim:   #1D4ED8;
+  --blue-dark:  #1E40AF;
+  --blue-glow:  rgba(37,99,235,0.16);
+  --blue-bg:    rgba(37,99,235,0.07);
+  --blue-light: #EFF6FF;
+
+  /* ── Surfaces (light theme) ─────────────────── */
+  --black:      #F1F5F9;
+  --surface:    #FFFFFF;
+  --surface2:   #F8FAFC;
+  --surface3:   #E2E8F0;
+
+  /* ── Borders ─────────────────────────────────── */
+  --border:     rgba(15,23,42,0.08);
+  --border2:    rgba(15,23,42,0.15);
+
+  /* ── Text ────────────────────────────────────── */
+  --text:       #0F172A;
+  --muted:      #64748B;
+  --muted2:     #94A3B8;
+
+  /* ── Semantic ────────────────────────────────── */
+  --success:    #16A34A;
+  --warning:    #D97706;
+  --info:       #0891B2;
+
+  /* ── Typography ──────────────────────────────── */
+  --font-head:  'Sora', sans-serif;
+  --font-body:  'Plus Jakarta Sans', sans-serif;
+  --font-mono:  'JetBrains Mono', monospace;
+
+  /* ── Shape ───────────────────────────────────── */
+  --r-sm:       6px;
+  --r-md:       10px;
+  --r-lg:       16px;
+  --shadow:     0 2px 16px rgba(15,23,42,0.08);
+  --shadow-lg:  0 8px 32px rgba(15,23,42,0.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--surface2); }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue); }
+
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font-body); cursor: pointer; }
+input, select, textarea { font-family: var(--font-body); }
+
+/* Utility */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
