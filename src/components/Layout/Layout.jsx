@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 
+
 export default function Layout({ title, actions, children }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 

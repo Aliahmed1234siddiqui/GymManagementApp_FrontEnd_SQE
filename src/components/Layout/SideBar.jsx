@@ -1,13 +1,13 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 export default function Sidebar({ collapsed, onToggle }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-
+  const location = useLocation();
   // Close mobile menu when route changes
   useEffect(() => {
     setMobileOpen(false);
-  }, [window.location.pathname]);
+  }, [location.pathname]);
 
   // Close mobile menu on resize to desktop
   useEffect(() => {
