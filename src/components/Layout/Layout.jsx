@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Header from './Header';
-import Sidebar from './Sidebar';
+import Sidebar from './SideBar';
 
 
 export default function Layout({ title, actions, children }) {
