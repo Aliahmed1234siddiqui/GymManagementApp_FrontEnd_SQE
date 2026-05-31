@@ -125,7 +125,7 @@ export default function MembersPage() {
     { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
     { key: 'renewalDate', label: 'Renewal', render: (v) => v ? new Date(v).toLocaleDateString('en-PK') : '—' },
     { key: '_id', label: 'Actions', render: (_, row) => (
-      <div style={{ display:'flex', gap:6 }}>
+      <div className="row-actions" style={{ display:'flex', gap:6 }}>
         <Btn size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); openEdit(row); }}>Edit</Btn>
         <Btn size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); setStatusTarget({ member: row, newStatus: row.status === 'Active' ? 'Suspended' : 'Active' }); }}>
           {row.status === 'Active' ? 'Suspend' : 'Activate'}
@@ -139,6 +139,52 @@ export default function MembersPage() {
 
   return (
     <Layout title="Members" actions={<Btn variant="primary" size="sm" onClick={openCreate}>+ Add Member</Btn>}>
+      <style>{`
+        /* Toolbar: search grows, status select sits beside it; stacks on phones */
+        .toolbar {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+        }
+        .toolbar-search { flex: 1 1 240px; min-width: 0; }
+        .toolbar > .field { flex: 0 0 auto; }
+
+        /* Two-column form inside the modal; collapses to one on small screens */
+        .form-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px;
+        }
+        .form-col-span { grid-column: 1 / -1; }
+
+        /* Avatar bubble in the member cell */
+        .member-avatar {
+          border-radius: 50%;
+          background: var(--primary);
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-family: var(--font-display);
+          flex-shrink: 0;
+        }
+
+        /* Keep the action buttons tidy on small screens */
+        .row-actions { flex-wrap: wrap; justify-content: flex-end; }
+
+        @media (max-width: 640px) {
+          .toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
+          .toolbar-search { flex: 1 1 auto; }
+          .toolbar > .field { width: 100%; }
+          .toolbar > .field select { width: 100%; }
+
+          .form-grid { grid-template-columns: 1fr; }
+        }
+      `}</style>
+
       <div className="toolbar">
         <div className="toolbar-search"><SearchBar value={search} onChange={setSearch} placeholder="Search name, email, card…" /></div>
         <Select options={statusOpts} value={statusFilter} onChange={(e) => setStatus(e.target.value)} style={{ minWidth:140 }} />

@@ -428,23 +428,57 @@ export default function ReportsPage() {
 
   return (
     <Layout title="Reports">
+      <style>{`
+        /* Top controls: report-type tabs on the left, actions pushed right; wraps on mobile */
+        .rpt-top {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+        .rpt-actions { display: flex; gap: 10px; margin-left: auto; }
+
+        /* Date filter row */
+        .rpt-filters {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          align-items: flex-end;
+          margin-top: 16px;
+        }
+
+        /* Preset tabs can be wider than a phone — let them scroll instead of overflowing */
+        .rpt-presets {
+          min-width: 0;
+          max-width: 100%;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          padding-bottom: 2px;
+        }
+        .rpt-presets::-webkit-scrollbar { height: 4px; }
+        .rpt-presets::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+        /* Date inputs sit side by side instead of each taking a full row */
+        .rpt-date { flex: 1 1 150px; min-width: 0; max-width: 220px; }
+
+        @media (max-width: 640px) {
+          .rpt-actions { margin-left: 0; width: 100%; }
+          .rpt-actions .btn { flex: 1; }
+          .rpt-presets { flex: 1 1 100%; }
+          .rpt-date { max-width: none; flex: 1 1 140px; }
+        }
+      `}</style>
+
       {/* Controls */}
       <Card style={{ marginBottom: 20 }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="rpt-top">
           <Tabs
             value={tab}
             onChange={setTab}
             options={["payments", "members"]}
             ariaLabel="Report type"
           />
-          <div style={{ display: "flex", gap: 10, marginLeft: "auto" }}>
+          <div className="rpt-actions">
             <Btn
               variant="primary"
               onClick={() => run()}
@@ -462,28 +496,24 @@ export default function ReportsPage() {
         </div>
 
         {tab === "payments" && (
-          <div
-            style={{
-              display: "flex",
-              gap: 12,
-              flexWrap: "wrap",
-              alignItems: "flex-end",
-              marginTop: 16,
-            }}
-          >
-            <Tabs
-              value={preset}
-              onChange={applyPreset}
-              options={PRESETS}
-              ariaLabel="Date range"
-            />
+          <div className="rpt-filters">
+            <div className="rpt-presets">
+              <Tabs
+                value={preset}
+                onChange={applyPreset}
+                options={PRESETS}
+                ariaLabel="Date range"
+              />
+            </div>
             <Input
+              className="rpt-date"
               label="Start date"
               type="date"
               value={dates.start}
               onChange={onDateChange("start")}
             />
             <Input
+              className="rpt-date"
               label="End date"
               type="date"
               value={dates.end}

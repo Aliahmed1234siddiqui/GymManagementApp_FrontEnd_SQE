@@ -51,6 +51,7 @@ function Button({ children, variant = 'primary', size = 'md', loading, onClick, 
         display: 'inline-flex',
         alignItems: 'center',
         gap: '8px',
+        whiteSpace: 'nowrap',
         opacity: loading ? 0.6 : 1
       }}
       {...props}
@@ -105,7 +106,8 @@ function StatusBadge({ status }) {
       borderRadius: '6px',
       fontSize: '12px',
       fontWeight: 600,
-      display: 'inline-block'
+      display: 'inline-block',
+      whiteSpace: 'nowrap'
     }}>
       {variant.label}
     </span>
@@ -456,7 +458,6 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reminderLoading, setReminderLoading] = useState(false);
-  const [reminderDone, setReminderDone] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -466,20 +467,7 @@ export default function AdminDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  const sendReminders = async () => {
-    setReminderLoading(true);
-    try {
-      const { data } = await paymentsAPI.sendReminders();
-      alert(data.message || 'Reminders sent successfully!');
-      setReminderDone(true);
-      setTimeout(() => setReminderDone(false), 4000);
-    } catch {
-      alert('Failed to send reminders');
-    } finally {
-      setReminderLoading(false);
-    }
-  };
-
+ 
   if (loading) {
     return (
       <Layout title="Dashboard">
@@ -504,16 +492,7 @@ export default function AdminDashboard() {
   return (
     <Layout
       title="Dashboard"
-      actions={
-        <>
-          <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>
-            ↺ Refresh
-          </Button>
-          <Button variant="primary" size="sm" loading={reminderLoading} onClick={sendReminders}>
-            {reminderDone ? '✓ Sent!' : '🔔 Send Reminders'}
-          </Button>
-        </>
-      }
+      
     >
       <style>{`
         .hero-grid {
@@ -525,7 +504,7 @@ export default function AdminDashboard() {
 
         .mini-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
           gap: 12px;
           margin-bottom: 24px;
         }
@@ -546,11 +525,15 @@ export default function AdminDashboard() {
         .chart-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .chart-scroll-inner { min-width: 460px; }
 
+        /* Members table: scroll on tablet so columns never get clipped by the card */
+        .members-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
         .section-head {
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 12px;
+          flex-wrap: wrap;
           padding: 20px 24px;
           border-bottom: 1px solid var(--border);
           background: var(--surface-2);
@@ -559,6 +542,7 @@ export default function AdminDashboard() {
         .table {
           width: 100%;
           border-collapse: collapse;
+          min-width: 620px;
         }
 
         .table th {
@@ -571,6 +555,7 @@ export default function AdminDashboard() {
           letter-spacing: 0.05em;
           border-bottom: 1px solid var(--border);
           background: var(--surface-2);
+          white-space: nowrap;
         }
 
         .table td {
@@ -592,6 +577,8 @@ export default function AdminDashboard() {
         @media (max-width: 640px) {
           .section-head { padding: 16px; }
 
+          .members-table-wrap { overflow-x: visible; }
+          .table { min-width: 0; }
           .table thead { display: none; }
           .table, .table tbody { display: block; width: 100%; }
 
@@ -739,68 +726,70 @@ export default function AdminDashboard() {
           <Button variant="ghost" onClick={() => { navigate('/admin/members'); }} size="sm">View All →</Button>
         </div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Member</th>
-              <th>Plan</th>
-              <th>Card No.</th>
-              <th>Joined</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(s.recentMembers || []).length === 0 ? (
+        <div className="members-table-wrap">
+          <table className="table">
+            <thead>
               <tr>
-                <td className="td-empty" colSpan={5} style={{
-                  textAlign: 'center',
-                  color: 'var(--text-muted)',
-                  padding: '40px'
-                }}>
-                  No members yet
-                </td>
+                <th>Member</th>
+                <th>Plan</th>
+                <th>Card No.</th>
+                <th>Joined</th>
+                <th>Status</th>
               </tr>
-            ) : (
-              (s.recentMembers || []).map((member, i) => (
-                <tr key={member._id}>
-                  <td className="td-member">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <Avatar name={member.name} index={i} />
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: '14px' }}>{member.name}</div>
-                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                          {member.email}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td data-label="Plan" style={{ fontSize: '14px', fontWeight: 500 }}>
-                    {member.plan?.name || '—'}
-                  </td>
-                  <td data-label="Card No." style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '13px',
-                    color: 'var(--text-muted)'
+            </thead>
+            <tbody>
+              {(s.recentMembers || []).length === 0 ? (
+                <tr>
+                  <td className="td-empty" colSpan={5} style={{
+                    textAlign: 'center',
+                    color: 'var(--text-muted)',
+                    padding: '40px'
                   }}>
-                    {member.gymCardNumber}
-                  </td>
-                  <td data-label="Joined" style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-                    {member.createdAt
-                      ? new Date(member.createdAt).toLocaleDateString('en-PK', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric'
-                        })
-                      : '—'}
-                  </td>
-                  <td data-label="Status">
-                    <StatusBadge status={member.status} />
+                    No members yet
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                (s.recentMembers || []).map((member, i) => (
+                  <tr key={member._id}>
+                    <td className="td-member" data-label="Member">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <Avatar name={member.name} index={i} />
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '14px' }}>{member.name}</div>
+                          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                            {member.email}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td data-label="Plan" style={{ fontSize: '14px', fontWeight: 500 }}>
+                      {member.plan?.name || '—'}
+                    </td>
+                    <td data-label="Card No." style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '13px',
+                      color: 'var(--text-muted)'
+                    }}>
+                      {member.gymCardNumber}
+                    </td>
+                    <td data-label="Joined" style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                      {member.createdAt
+                        ? new Date(member.createdAt).toLocaleDateString('en-PK', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          })
+                        : '—'}
+                    </td>
+                    <td data-label="Status">
+                      <StatusBadge status={member.status} />
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </Card>
     </Layout>
   );

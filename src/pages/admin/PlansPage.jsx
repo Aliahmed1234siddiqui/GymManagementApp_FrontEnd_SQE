@@ -87,7 +87,106 @@ export default function PlansPage() {
 
   return (
     <Layout title="Plans" actions={<Btn variant="primary" size="sm" onClick={() => { setForm(BLANK); setCreateOpen(true); }}>+ New Plan</Btn>}>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:20 }}>
+      <style>{`
+        .plans-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+          gap: 20px;
+        }
+
+        .plan-card {
+          display: flex;
+          flex-direction: column;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          padding: 24px;
+          box-shadow: var(--shadow-sm, 0 1px 2px rgba(26,29,41,.06));
+          transition: transform .18s ease, box-shadow .18s ease;
+        }
+        .plan-card:hover {
+          transform: translateY(-3px);
+          box-shadow: var(--shadow-md, 0 6px 20px rgba(26,29,41,.10));
+        }
+        .plan-card--featured {
+          border: 2px solid var(--primary);
+          position: relative;
+        }
+        .plan-card--featured::after {
+          content: 'Popular';
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          font-family: var(--font-mono);
+          font-size: 10px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: .06em;
+          color: var(--primary);
+          background: rgba(55,50,85,.10);
+          padding: 3px 9px;
+          border-radius: 999px;
+        }
+
+        .plan-name {
+          font-family: var(--font-display);
+          font-size: 18px;
+          font-weight: 700;
+          color: var(--text);
+        }
+        .plan-price {
+          font-family: var(--font-display);
+          font-size: 34px;
+          font-weight: 700;
+          color: var(--text);
+          line-height: 1.1;
+          margin: 6px 0 2px;
+        }
+        .plan-price small {
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--text-muted);
+        }
+
+        .plan-features {
+          list-style: none;
+          padding: 0;
+          margin: 16px 0 0;
+          display: flex;
+          flex-direction: column;
+          gap: 9px;
+          flex: 1;
+        }
+        .plan-features li {
+          position: relative;
+          padding-left: 24px;
+          font-size: 14px;
+          color: var(--text);
+          line-height: 1.4;
+        }
+        .plan-features li::before {
+          content: '✓';
+          position: absolute;
+          left: 0;
+          top: 0;
+          color: var(--success);
+          font-weight: 700;
+        }
+
+        .form-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          gap: 14px;
+        }
+
+        @media (max-width: 480px) {
+          .plan-card { padding: 20px; }
+          .plan-price { font-size: 30px; }
+          .form-grid { grid-template-columns: 1fr; }
+        }
+      `}</style>
+
+      <div className="plans-grid">
         {plans.map((plan, i) => (
           <div key={plan._id} className={`plan-card ${i === 1 ? 'plan-card--featured' : ''}`}>
             <div className="plan-name">{plan.name}</div>

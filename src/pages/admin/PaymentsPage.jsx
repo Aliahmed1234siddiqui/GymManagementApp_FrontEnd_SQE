@@ -28,7 +28,7 @@ function PaymentForm({ form, setForm, members, plans, loading, onSubmit, onClose
         <Input label="Note" value={form.note} onChange={set('note')} placeholder="Optional note" />
       </div>
       {form.method === 'Bank Transfer' && (
-        <div style={{ background:'rgba(245,158,11,.08)', border:'1px solid rgba(245,158,11,.2)', borderRadius:8, padding:'10px 14px', fontSize:12.5, color:'#fbbf24' }}>
+        <div style={{ background:'rgba(245,158,11,.08)', border:'1px solid rgba(245,158,11,.2)', borderRadius:8, padding:'10px 14px', fontSize:12.5, color:'#b06d00' }}>
           Bank Transfer starts as <strong>Pending</strong>. Manually confirm after bank verification.
         </div>
       )}
@@ -95,7 +95,7 @@ export default function PaymentsPage() {
     { key:'invoiceNumber', label:'Invoice', render:(v) => <span style={{ fontFamily:'var(--font-mono)', fontSize:12 }}>{v}</span> },
     { key:'member', label:'Member', render:(v) => <div><div style={{ fontWeight:600 }}>{v?.name}</div><div style={{ fontSize:11, color:'var(--muted)' }}>{v?.gymCardNumber}</div></div> },
     { key:'plan', label:'Plan', render:(v) => v?.name || '—' },
-    { key:'amount', label:'Amount', render:(v) => <span style={{ fontFamily:'var(--font-head)', fontSize:18, color:'var(--red)' }}>Rs {v?.toLocaleString()}</span> },
+    { key:'amount', label:'Amount', render:(v) => <span style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:18, color:'var(--red)' }}>Rs {v?.toLocaleString()}</span> },
     { key:'method', label:'Method', render:(v) => <span style={{ fontSize:12, color:'var(--muted)' }}>{v}</span> },
     { key:'status', label:'Status', render:(v) => <StatusBadge status={v} /> },
     { key:'paidAt', label:'Paid At', render:(v) => v ? new Date(v).toLocaleDateString('en-PK') : '—' },
@@ -113,6 +113,34 @@ export default function PaymentsPage() {
 
   return (
     <Layout title="Payments" actions={<Btn variant="primary" size="sm" onClick={() => { setForm(BLANK); setCreateOpen(true); }}>+ Record Payment</Btn>}>
+      <style>{`
+        /* Filter toolbar: selects sit inline, wrap/stack on small screens */
+        .toolbar {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+        }
+        .toolbar > .field { flex: 0 1 auto; }
+
+        /* Two-column form grid inside the modal; one column on phones */
+        .form-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px;
+        }
+        .form-col-span { grid-column: 1 / -1; }
+
+        @media (max-width: 640px) {
+          .toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
+          .toolbar > .field { width: 100%; flex: 1 1 auto; }
+          .toolbar > .field select { width: 100%; min-width: 0 !important; }
+
+          .form-grid { grid-template-columns: 1fr; }
+        }
+      `}</style>
+
       <div className="toolbar">
         <Select options={statusOpts} value={filters.status} onChange={(e) => setFilters((f) => ({ ...f, status:e.target.value }))} style={{ minWidth:140 }} />
         <Select options={methodOpts} value={filters.method} onChange={(e) => setFilters((f) => ({ ...f, method:e.target.value }))} style={{ minWidth:160 }} />

@@ -1,17 +1,30 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { paymentsAPI } from "../../api/services";
 
 export default function Header({ title, actions }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [reminderDone, setReminderDone] = useState(false);
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
+   const sendReminders = async () => {
+      try {
+        const { data } = await paymentsAPI.sendReminders();
+        alert(data.message || 'Reminders sent successfully!');
+        setReminderDone(true);
+        setTimeout(() => setReminderDone(false), 4000);
+      } catch {
+        alert('Failed to send reminders');
+      } 
+    };
+  
   return (
     <>
       <style>{`
@@ -231,57 +244,106 @@ export default function Header({ title, actions }) {
 
         <div className="header-actions">
           {actions}
-          
+
           <div className="user-menu-wrapper">
-            <button 
+            <button
               className="user-button"
               onClick={() => setShowUserMenu(!showUserMenu)}
             >
               <div className="user-avatar">
-                {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+                {user?.name?.charAt(0)?.toUpperCase() || "A"}
               </div>
               <div className="user-info">
-                <div className="user-name">{user?.name || 'Admin'}</div>
-                <div className="user-role">{user?.role || 'admin'}</div>
+                <div className="user-name">{user?.name || "Admin"}</div>
+                <div className="user-role">{user?.role || "admin"}</div>
               </div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="6 9 12 15 18 9"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <polyline points="6 9 12 15 18 9" />
               </svg>
             </button>
 
             {showUserMenu && (
               <>
-                <div 
+                <div
                   style={{
-                    position: 'fixed',
+                    position: "fixed",
                     inset: 0,
-                    zIndex: 99
+                    zIndex: 99,
                   }}
                   onClick={() => setShowUserMenu(false)}
                 />
                 <div className="user-menu" style={{ zIndex: 100 }}>
                   <div className="user-menu-header">
-                    <div className="user-menu-name">{user?.name || 'Admin'}</div>
-                    <div className="user-menu-email">{user?.email || 'admin@massgym.com'}</div>
+                    <div className="user-menu-name">
+                      {user?.name || "Admin"}
+                    </div>
+                    <div className="user-menu-email">
+                      {user?.email || "admin@massgym.com"}
+                    </div>
                   </div>
-                  
-                  <button className="user-menu-item" onClick={() => navigate('/admin/profile')}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
+
+                  <button
+                    className="user-menu-item"
+                    onClick={() => navigate("/admin/profile")}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
                     </svg>
                     Profile
                   </button>
 
-                  
+                  <button className="user-menu-item" onClick={sendReminders}>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    Send Reminders
+                  </button>
 
-                  <div style={{ borderTop: '1px solid var(--border)', margin: '4px 0' }} />
+                  <div
+                    style={{
+                      borderTop: "1px solid var(--border)",
+                      margin: "4px 0",
+                    }}
+                  />
 
-                  <button className="user-menu-item danger" onClick={handleLogout}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                      <polyline points="16 17 21 12 16 7"/>
-                      <line x1="21" y1="12" x2="9" y2="12"/>
+                  <button
+                    className="user-menu-item danger"
+                    onClick={handleLogout}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" y1="12" x2="9" y2="12" />
                     </svg>
                     Logout
                   </button>

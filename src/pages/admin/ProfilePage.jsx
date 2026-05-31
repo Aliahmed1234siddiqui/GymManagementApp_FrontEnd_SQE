@@ -32,7 +32,7 @@ function DetailRow({ label, children, last }) {
       padding: '12px 0', borderBottom: last ? 'none' : '1px solid var(--border)'
     }}>
       <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{label}</span>
-      <span style={{ fontSize: 13.5, color: 'var(--text)', fontWeight: 600, textAlign: 'right' }}>{children}</span>
+      <span style={{ fontSize: 13.5, color: 'var(--text)', fontWeight: 600, textAlign: 'right', wordBreak: 'break-word' }}>{children}</span>
     </div>
   );
 }
@@ -45,10 +45,9 @@ function LockedField({ label, value, hint }) {
         <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)' }}>🔒 Locked</span>
       </label>
       <input
-        className="ui-input"
+        className="field-input"
         value={value || ''}
         disabled
-      
         style={{ background: 'var(--surface-2)', color: 'var(--text-muted)', cursor: 'not-allowed' }}
       />
       {hint && <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{hint}</span>}
@@ -127,6 +126,27 @@ export default function ProfilePage() {
 
   return (
     <Layout title="Profile">
+      <style>{`
+        .profile-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 20px;
+        }
+
+        .form-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px;
+        }
+        .form-col-span { grid-column: 1 / -1; }
+
+        @media (max-width: 640px) {
+          .form-grid { grid-template-columns: 1fr; }
+          /* When the header wraps, let the "Member Since" block align left and span full width */
+          .profile-since { text-align: left !important; width: 100%; }
+        }
+      `}</style>
+
       {/* Header card */}
       <Card style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
         <div style={{
@@ -140,7 +160,7 @@ export default function ProfilePage() {
 
         <div style={{ flex: 1, minWidth: 200 }}>
           <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', lineHeight: 1.2 }}>{p.name}</div>
-          <div style={{ fontSize: 13.5, color: 'var(--text-muted)', marginTop: 4 }}>{p.email}</div>
+          <div style={{ fontSize: 13.5, color: 'var(--text-muted)', marginTop: 4, wordBreak: 'break-word' }}>{p.email}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
             <span style={{
               background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--primary)',
@@ -152,7 +172,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div style={{ textAlign: 'right' }}>
+        <div className="profile-since" style={{ textAlign: 'right' }}>
           <div style={{ fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.05em', fontFamily: 'var(--font-mono)' }}>
             Member Since
           </div>
@@ -161,7 +181,7 @@ export default function ProfilePage() {
       </Card>
 
       {/* Two-column: edit form + account details */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
+      <div className="profile-grid">
         {/* Edit profile */}
         <Card>
           <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>Edit Profile</div>
