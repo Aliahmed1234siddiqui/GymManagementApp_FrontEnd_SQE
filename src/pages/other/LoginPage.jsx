@@ -624,7 +624,7 @@ export default function LoginPage() {
         <div className="login-form-panel">
           <div className="form-wrapper">
             <div className="logo-section">
-              <img src='./public/mass_gym_logo.png' alt='Mass Gym Logo' />
+              <img src='/mass_gym_logo.png' alt='Mass Gym Logo' />
               <div className="welcome-text">
                 <h1>Welcome Back</h1>
                 <p>Sign in to access your gym dashboard</p>
