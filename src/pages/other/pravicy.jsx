@@ -374,7 +374,7 @@ export default function PrivacyPage() {
             Back
           </button>
           <a href="/" className="logo-link">
-            <img src='./public/mass_gym_logo.png' alt='Mass Gym Logo' />
+            <img src='/mass_gym_logo.png' alt='Mass Gym Logo' />
           </a>
         </div>
       </nav>

@@ -10,8 +10,12 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('mgToken');
     if (!token) { setLoading(false); return; }
+
     authAPI.me()
-      .then(({ data }) => setUser(data))
+      .then(({ data }) => {
+        // ── FIX: handle both { _id, name, ... } and { user: { _id, ... } }
+        setUser(data.user ?? data);
+      })
       .catch(() => localStorage.removeItem('mgToken'))
       .finally(() => setLoading(false));
   }, []);
