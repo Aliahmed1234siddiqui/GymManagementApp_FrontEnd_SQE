@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react';
 export default function Sidebar({ collapsed, onToggle }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  // Close mobile menu when route changes
+
+  // Close the mobile menu whenever the route actually changes
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  // Close mobile menu on resize to desktop
+  // Close mobile menu on resize up to desktop
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 1024) {
@@ -19,6 +20,13 @@ export default function Sidebar({ collapsed, onToggle }) {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Lock body scroll while the mobile drawer is open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
   const menuItems = [
     {
       icon: (
@@ -44,7 +52,6 @@ export default function Sidebar({ collapsed, onToggle }) {
       label: 'Members',
       path: '/admin/members'
     },
-   
     {
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -81,9 +88,7 @@ export default function Sidebar({ collapsed, onToggle }) {
     }
   ];
 
-  const toggleMobileMenu = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  const toggleMobileMenu = () => setMobileOpen((v) => !v);
 
   return (
     <>
@@ -117,7 +122,7 @@ export default function Sidebar({ collapsed, onToggle }) {
           display: flex;
           flex-direction: column;
           z-index: 200;
-          transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           width: 260px;
         }
 
@@ -199,14 +204,8 @@ export default function Sidebar({ collapsed, onToggle }) {
           overflow-x: hidden;
         }
 
-        .sidebar-menu::-webkit-scrollbar {
-          width: 4px;
-        }
-
-        .sidebar-menu::-webkit-scrollbar-thumb {
-          background: var(--border);
-          border-radius: 2px;
-        }
+        .sidebar-menu::-webkit-scrollbar { width: 4px; }
+        .sidebar-menu::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
         .menu-item {
           display: flex;
@@ -259,15 +258,8 @@ export default function Sidebar({ collapsed, onToggle }) {
           transition: opacity 0.3s;
         }
 
-        .sidebar.collapsed .menu-item-label {
-          opacity: 0;
-          width: 0;
-        }
-
-        .sidebar.collapsed .menu-item {
-          justify-content: center;
-          padding: 12px;
-        }
+        .sidebar.collapsed .menu-item-label { opacity: 0; width: 0; }
+        .sidebar.collapsed .menu-item { justify-content: center; padding: 12px; }
 
         .sidebar-footer {
           padding: 16px;
@@ -297,16 +289,8 @@ export default function Sidebar({ collapsed, onToggle }) {
           flex-shrink: 0;
         }
 
-        .sidebar-footer-text {
-          flex: 1;
-          overflow: hidden;
-          transition: opacity 0.3s;
-        }
-
-        .sidebar.collapsed .sidebar-footer-text {
-          opacity: 0;
-          width: 0;
-        }
+        .sidebar-footer-text { flex: 1; overflow: hidden; transition: opacity 0.3s; }
+        .sidebar.collapsed .sidebar-footer-text { opacity: 0; width: 0; }
 
         .sidebar-footer-label {
           font-size: 11px;
@@ -327,7 +311,14 @@ export default function Sidebar({ collapsed, onToggle }) {
           .sidebar {
             transform: translateX(-100%);
             box-shadow: none;
+            width: 260px;
           }
+          /* On mobile the drawer is always full-width regardless of collapsed state */
+          .sidebar.collapsed { width: 260px; }
+          .sidebar.collapsed .sidebar-logo-text,
+          .sidebar.collapsed .menu-item-label,
+          .sidebar.collapsed .sidebar-footer-text { opacity: 1; width: auto; }
+          .sidebar.collapsed .menu-item { justify-content: flex-start; padding: 12px 14px; }
 
           .sidebar.mobile-open {
             transform: translateX(0);
@@ -348,31 +339,20 @@ export default function Sidebar({ collapsed, onToggle }) {
           border: none;
           color: white;
           cursor: pointer;
-          z-index: 199;
+          z-index: 201;
           box-shadow: 0 4px 16px rgba(55, 50, 85, 0.4);
           transition: all 0.3s;
         }
 
-        .mobile-menu-button:hover {
-          transform: scale(1.05);
-          box-shadow: 0 6px 24px rgba(55, 50, 85, 0.5);
-        }
-
-        .mobile-menu-button:active {
-          transform: scale(0.95);
-        }
+        .mobile-menu-button:hover { transform: scale(1.05); box-shadow: 0 6px 24px rgba(55, 50, 85, 0.5); }
+        .mobile-menu-button:active { transform: scale(0.95); }
 
         @media (max-width: 1024px) {
-          .mobile-menu-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
+          .mobile-menu-button { display: flex; align-items: center; justify-content: center; }
         }
 
-        /* Mobile Overlay */
+        /* Mobile Overlay — only present in the DOM when the drawer is open */
         .mobile-overlay {
-          display: none;
           position: fixed;
           inset: 0;
           background: rgba(0, 0, 0, 0.5);
@@ -381,30 +361,19 @@ export default function Sidebar({ collapsed, onToggle }) {
           animation: fadeIn 0.2s ease-out;
         }
 
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        .mobile-overlay.active {
-          display: block;
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       `}</style>
 
-      {/* Mobile Overlay */}
+      {/* Mobile Overlay (rendered only when open, so it never blocks taps otherwise) */}
       {mobileOpen && (
-        <div 
-          className="mobile-overlay active" 
+        <div
+          className="mobile-overlay"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       {/* Mobile Menu Button */}
-      <button 
+      <button
         className="mobile-menu-button"
         onClick={toggleMobileMenu}
         aria-label="Toggle menu"
@@ -425,10 +394,7 @@ export default function Sidebar({ collapsed, onToggle }) {
       <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <img 
-              src="/mass_gym_logo.png" 
-              alt="Mass Gym" 
-            />
+            <img src="/mass_gym_logo.png" alt="Mass Gym" />
             <div className="sidebar-logo-text">Mass Gym</div>
           </div>
           <button className="sidebar-toggle" onClick={onToggle}>
@@ -449,6 +415,7 @@ export default function Sidebar({ collapsed, onToggle }) {
               to={item.path}
               className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}
               end={item.path === '/admin'}
+              onClick={() => setMobileOpen(false)}
             >
               <div className="menu-item-icon">{item.icon}</div>
               <span className="menu-item-label">{item.label}</span>

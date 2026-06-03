@@ -520,7 +520,6 @@ const _MASS_GYM_STYLES = `/* ===================================================
   .modal-title { font-size: 17px; }
   .table thead th, .table tbody td { padding: 12px 14px; }
   .search-bar { max-width: 100%; }
-  .toast-container { left: 16px; right: 16px; top: 16px; }
   .toast { min-width: 0; max-width: 100%; }
 }
 
@@ -934,7 +933,7 @@ export function ToastProvider({ children }) {
   return (
     <>
       {children}
-      <div className="toast-container" role="region" aria-live="polite">
+      <div  role="region" aria-live="polite">
         {toasts.map((t) => (
           <div key={t.id} className={`toast toast-${t.type}`}>
             <span>{t.message}</span>
